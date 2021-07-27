@@ -984,7 +984,7 @@ func set_owners_complete():
 func apply_properties() -> void:
 	for entity_idx in range(0, entity_nodes.size()):
 		var entity_node = entity_nodes[entity_idx]
-		if not entity_node:
+		if not entity_node or !is_instance_valid(entity_node):
 			continue
 
 		var entity_dict := entity_dicts[entity_idx] as Dictionary
