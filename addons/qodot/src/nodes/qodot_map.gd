@@ -31,6 +31,7 @@ var use_trenchbroom_group_hierarchy := false
 var block_until_complete := false
 var tree_attach_batch_size := 16
 var set_owner_batch_size := 16
+var external_texture_dict := {}
 
 # Build context variables
 var qodot = null
@@ -59,6 +60,7 @@ var entity_mesh_instances := {}
 var worldspawn_layer_mesh_instances := {}
 var entity_collision_shapes := []
 var worldspawn_layer_collision_shapes := []
+var owner_node: Node = null
 
 func set_map_file(new_map_file: String) -> void:
 	if map_file != new_map_file:
@@ -117,7 +119,10 @@ func _get_property_list() -> Array:
 	]
 
 # Utility
-func verify_and_build():
+func verify_and_build(level_root=null):
+	if is_instance_valid(level_root):
+		owner_node = level_root
+
 	if verify_parameters():
 		build_map()
 	else:
@@ -344,7 +349,8 @@ func init_texture_loader() -> QodotTextureLoader:
 	return QodotTextureLoader.new(
 		base_texture_dir,
 		texture_file_extensions,
-		texture_wads
+		texture_wads,
+		external_texture_dict
 	)
 
 func load_textures() -> Dictionary:
@@ -968,7 +974,10 @@ func set_owners():
 		for i in range(0, set_owner_batch_size):
 			var node = set_owner_array.pop_front()
 			if node:
-				set_owner_editor(node)
+				if owner_node:
+					node.owner = owner_node
+				else:
+					set_owner_editor(node)
 			else:
 				set_owners_complete()
 				return

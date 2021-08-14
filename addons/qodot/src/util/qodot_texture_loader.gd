@@ -50,6 +50,7 @@ const PBR_SUFFIX_PROPERTIES := {
 var base_texture_path: String
 var texture_extensions: PoolStringArray
 var texture_wads: Array
+var external_texture_dict: Dictionary
 
 # Instances
 var directory := Directory.new()
@@ -70,10 +71,12 @@ func get_pbr_suffix_pattern(suffix: int) -> String:
 func _init(
 		base_texture_path: String,
 		texture_extensions: PoolStringArray,
-		texture_wads: Array
+		texture_wads: Array,
+		external_texture_dict={}
 	) -> void:
 	self.base_texture_path = base_texture_path
 	self.texture_extensions = texture_extensions
+	self.external_texture_dict = external_texture_dict
 
 	load_texture_wad_resources(texture_wads)
 
@@ -96,6 +99,17 @@ func load_textures(texture_list: Array) -> Dictionary:
 func load_texture(texture_name: String) -> Texture:
 	if(texture_name == TEXTURE_EMPTY):
 		return null
+	
+	# Load image as texture if it's external
+	if (texture_name in external_texture_dict):
+		var img = Image.new()
+		var err = img.load(external_texture_dict[texture_name])
+		if err == 0:
+			var tex = ImageTexture.new()
+			tex.create_from_image(img)
+			return tex
+		else:
+			return null
 
 	# Load albedo texture if it exists
 	for texture_extension in texture_extensions:
@@ -106,7 +120,7 @@ func load_texture(texture_name: String) -> Texture:
 		else:
 			var texture = load(texture_path)
 			if texture:
-				return texture as Texture	
+				return texture as Texture
 
 	var texture_name_lower : String = texture_name.to_lower()
 	for texture_wad in texture_wad_resources:
