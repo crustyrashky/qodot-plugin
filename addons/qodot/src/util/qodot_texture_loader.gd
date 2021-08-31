@@ -101,13 +101,13 @@ func load_texture(texture_name: String) -> Texture:
 		return null
 	
 	# Load image as texture if it's external
-	if (texture_name in external_texture_dict):
+	if texture_name in external_texture_dict:
 		var img = Image.new()
 		var err = img.load(external_texture_dict[texture_name])
 		if err == 0:
 			var tex = ImageTexture.new()
 			tex.create_from_image(img)
-			return tex
+			return tex as Texture
 		else:
 			return null
 

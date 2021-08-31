@@ -55,6 +55,7 @@ var worldspawn_layer_dicts := []
 var entity_mesh_dict := {}
 var worldspawn_layer_mesh_dict := {}
 var entity_nodes := []
+var ignored_entity_names := []
 var worldspawn_layer_nodes := []
 var entity_mesh_instances := {}
 var worldspawn_layer_mesh_instances := {}
@@ -105,6 +106,7 @@ func _get_property_list() -> Array:
 		QodotUtil.property_dict('worldspawn_layers', TYPE_ARRAY),
 		QodotUtil.property_dict('brush_clip_texture', TYPE_STRING),
 		QodotUtil.property_dict('face_skip_texture', TYPE_STRING),
+		QodotUtil.property_dict('external_texture_dict', TYPE_DICTIONARY),
 		QodotUtil.property_dict('texture_wads', TYPE_ARRAY, -1),
 		QodotUtil.category_dict('Materials'),
 		QodotUtil.property_dict('material_file_extension', TYPE_STRING),
@@ -119,9 +121,11 @@ func _get_property_list() -> Array:
 	]
 
 # Utility
-func verify_and_build(level_root=null):
+func verify_and_build(level_root=null, ignore_names=[]):
 	if is_instance_valid(level_root):
 		owner_node = level_root
+	
+	ignored_entity_names = ignore_names
 
 	if verify_parameters():
 		build_map()
@@ -426,6 +430,9 @@ func build_entity_nodes() -> Array:
 		if 'classname' in properties:
 			var classname = properties['classname']
 			node_name += "_" + classname
+			if classname in ignored_entity_names:
+				entity_nodes.append(null)
+				continue
 			if classname in entity_definitions:
 				var entity_definition := entity_definitions[classname] as QodotFGDClass
 				if entity_definition is QodotFGDSolidClass:
