@@ -443,7 +443,7 @@ func build_entity_nodes() -> Array:
 				elif entity_definition is QodotFGDPointClass:
 					if entity_definition.scene_file:
 						# GEN_EDIT_STATE_INSTANCE can crash exported builds
-						node = entity_definition.scene_file.instance(PackedScene.GEN_EDIT_STATE_INSTANCE if OS.has_feature("standalone") else PackedScene.GEN_EDIT_STATE_DISABLED)
+						node = entity_definition.scene_file.instance(PackedScene.GEN_EDIT_STATE_DISABLED if OS.has_feature("standalone") else PackedScene.GEN_EDIT_STATE_INSTANCE)
 
 				if entity_definition.script_class:
 					node.set_script(entity_definition.script_class)
